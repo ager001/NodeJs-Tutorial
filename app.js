@@ -1,5 +1,6 @@
 const { parse } = require('dotenv');
 const express = require('express');
+const { m } = require('framer-motion');
 const app = express();
 const PORT = process.env.PORT || 8000;// Updated to use PORT from .env file
 
@@ -101,6 +102,14 @@ app.get('/', (req, res)=>{
     res.send("Midenga NodeJs Tutorial");
 });
 
+app.get("/movies", (req,res)=>{
+// Movies array
+
+res.json({success: true, data: movies,
+    totalAmountOfMovies: movies.length
+})
+});
+
 app.get('/movies/:id', (req,res)=>{
     console.log("Route parameter:", req.params);// always sent as string
     const movieId = parseInt(req.params.id);//converting string to number
@@ -118,13 +127,25 @@ app.get('/movies/:id', (req,res)=>{
     });
 });
 
-app.get("/movies", (req,res)=>{
-// Movies array
 
-res.json({success: true, data: movies,
-    totalAmountOfMovies: movies.length
-})
+app.get('/get-movies', (req, res) => {
+    const query = req.query;
+    console.log("Request Query:", query);
+    
+    const title = query.title;
+
+    // Optional: Logic to filter the list based on the title provided
+    const filteredMovies = title 
+        ? movies.filter(m => m.title.toLowerCase().includes(title.toLowerCase().replace(/"/g, '')))
+        : movies;
+
+    res.json({
+        success: true,
+        message: "This is the list of movies",
+        data: filteredMovies // No brackets here if filteredMovies is already an array
+    });
 });
+
 
 app.get('/status', (req, res)=>{
     res.status(200).json({status: "OK"});
