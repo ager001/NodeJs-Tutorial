@@ -1,4 +1,7 @@
 
+{/*
+  this file contains sample data for movies and users.
+*/}
 
 let movies = [
   {
@@ -52,4 +55,5 @@ let users = [
 
 ];
 
-module.exports = {movies, users};
+
+module.exports = { movies, users };

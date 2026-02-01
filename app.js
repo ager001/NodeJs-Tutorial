@@ -1,9 +1,8 @@
-const { parse } = require('dotenv');
 const express = require('express');
 const { movies, users } = require('./data/data');
-const  getMovies = require('./controllers/movies');
+const  {getMovies, allMovies} = require('./controllers/movies');
+const {getUsers, allUsers} = require('./controllers/users');
 
-require('dotenv').config();// Load environment variables from .env file
 
 
 const app = express();
@@ -51,41 +50,18 @@ app.get('/', (req, res)=>{
     res.send("Midenga NodeJs Tutorial");
 });
 
-app.get("/movies", (req,res)=>{
-// Movies array
+app.get("/movies", allMovies);
 
-res.json({success: true, data: movies,
-    totalAmountOfMovies: movies.length
-})
-});
+
+app.get("/users", allUsers);
 
 
 // Route to get a specific movie by ID
 app.get('/movies/:id', getMovies );
 
+// Controller for getting users
+app.get('/users/:id', getUsers );
 
-app.get('/users/:id', (req, res) => {
-    // 1. Extract the ID from the URL parameters
-    const userId = parseInt(req.params.id); 
-
-    // 2. Find the specific user in the array
-    const user = users.find((u) => u.id === userId);
-
-    // 3. Logic Gate: Handle the case where the user doesn't exist
-    if (!user) {
-        return res.status(404).json({
-            success: false,
-            message: `User with id ${userId} not found`
-        });
-    }
-
-    // 4. Success Response: Send the user data back
-    res.status(200).json({
-        success: true,
-        data: user,
-        message: `User with id ${userId} found successfully`
-    });
-});
 
 
 

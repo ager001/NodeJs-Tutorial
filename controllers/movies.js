@@ -1,6 +1,7 @@
+// controllers/movies.js. In this file we define the getMovies function to handle requests for a specific movie by its ID.
+
+
 const {movies} = require('../data/data')
-
-
 
 
 const getMovies = ((req, res)=>{
@@ -20,6 +21,16 @@ const getMovies = ((req, res)=>{
     });
 })
 
+const allMovies = (req, res) => {
+    // Logic: Return the movies array and its current count
+    res.json({
+        success: true, 
+        data: movies,
+        totalAmountOfMovies: movies.length
+    });
+};
 
 
-module.exports = getMovies;
+
+
+module.exports = {getMovies, allMovies};
