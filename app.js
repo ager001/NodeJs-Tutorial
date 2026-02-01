@@ -1,6 +1,11 @@
 const { parse } = require('dotenv');
 const express = require('express');
-const { m } = require('framer-motion');
+const { movies, users } = require('./data/data');
+const  getMovies = require('./controllers/movies');
+
+require('dotenv').config();// Load environment variables from .env file
+
+
 const app = express();
 const PORT = process.env.PORT || 8000;// Updated to use PORT from .env file
 
@@ -42,62 +47,6 @@ app.use((req, res, next)=>{
 
 });
 
-
-
-
-
-let movies = [
-  {
-    id: 1,
-    title: "Inception",
-    year: 2010,
-    genre: "Sci-Fi"
-  },
-  {
-    id: 2,
-    title: "The Dark Knight",
-    year: 2008,
-    genre: "Action"
-  },
-  {
-    id: 3,
-    title: "Interstellar",
-    year: 2014,
-    genre: "Sci-Fi"
-  },
-  {
-    id: 4,
-    title: "Parasite",
-    year: 2019,
-    genre: "Thriller"
-  },
-  {
-    id: 5,
-    title: "The Godfather",
-    year: 1972,
-    genre: "Crime"
-  }
-];
-
-let users = [
-    {
-    id: 1,    
-    name: "Midenga",
-    email: "agermidenga@gmail.com"
-    },
-    {
-        id: 2,
-        name:"Bwai",
-        email:"abrahambwai@gmail.com"
-    },
-    {
-        id: 3,
-        name:"Mao",
-        email:"zerrubabelmao@gmail.com"
-    },
-
-];
-
 app.get('/', (req, res)=>{
     res.send("Midenga NodeJs Tutorial");
 });
@@ -110,22 +59,35 @@ res.json({success: true, data: movies,
 })
 });
 
-app.get('/movies/:id', (req,res)=>{
-    console.log("Route parameter:", req.params);// always sent as string
-    const movieId = parseInt(req.params.id);//converting string to number
-    const movie = movies.find((movie) => movie.id === movieId)// Finding movie by id
-    if(!movie){
+
+// Route to get a specific movie by ID
+app.get('/movies/:id', getMovies );
+
+
+app.get('/users/:id', (req, res) => {
+    // 1. Extract the ID from the URL parameters
+    const userId = parseInt(req.params.id); 
+
+    // 2. Find the specific user in the array
+    const user = users.find((u) => u.id === userId);
+
+    // 3. Logic Gate: Handle the case where the user doesn't exist
+    if (!user) {
         return res.status(404).json({
-            success:false,
-            message: `movie with id ${movieId} not found`
+            success: false,
+            message: `User with id ${userId} not found`
         });
     }
+
+    // 4. Success Response: Send the user data back
     res.status(200).json({
         success: true,
-        data: movie,
-        message: `movie with id ${movieId} found successfully`
+        data: user,
+        message: `User with id ${userId} found successfully`
     });
 });
+
+
 
 
 app.get('/get-movies', (req, res) => {
