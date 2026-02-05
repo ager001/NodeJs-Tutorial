@@ -30,7 +30,24 @@ const allMovies = (req, res) => {
     });
 };
 
+const findMovies = (req, res) => {
+    const query = req.query;
+    const title = query.title;
+
+    // Filter logic: Checks if title exists, handles case-insensitivity and quotes
+    const filteredMovies = title 
+        ? movies.filter(m => 
+            m.title.toLowerCase().includes(title.toLowerCase().replace(/"/g, ''))
+          )
+        : movies;
+
+    res.json({
+        success: true,
+        message: title ? `Results for "${title}"` : "This is the full list of movies",
+        data: filteredMovies
+    });
+};
 
 
 
-module.exports = {getMovies, allMovies};
+module.exports = {getMovies, allMovies, findMovies};

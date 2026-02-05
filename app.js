@@ -1,7 +1,8 @@
 const express = require('express');
-const { movies, users } = require('./data/data');
-const  {getMovies, allMovies} = require('./controllers/movies');
-const {getUsers, allUsers} = require('./controllers/users');
+const movieRouter = require('./routes/movies');
+const usersRouter = require('./routes/users');
+const homePage = require('./routes/home');
+const filterMovies = require('./routes/movies')
 
 
 
@@ -46,63 +47,13 @@ app.use((req, res, next)=>{
 
 });
 
-app.get('/', (req, res)=>{
-    res.send("Midenga NodeJs Tutorial");
-});
-
-app.get("/movies", allMovies);
-
-
-app.get("/users", allUsers);
+// Routes
+app.use(movieRouter);
+app.use(usersRouter);
+app.use(homePage);
+app.use(filterMovies);
 
 
-// Route to get a specific movie by ID
-app.get('/movies/:id', getMovies );
-
-// Controller for getting users
-app.get('/users/:id', getUsers );
-
-
-
-
-
-app.get('/get-movies', (req, res) => {
-    const query = req.query;
-    console.log("Request Query:", query);
-    
-    const title = query.title;
-
-    // Optional: Logic to filter the list based on the title provided
-    const filteredMovies = title 
-        ? movies.filter(m => m.title.toLowerCase().includes(title.toLowerCase().replace(/"/g, '')))
-        : movies;
-
-    res.json({
-        success: true,
-        message: "This is the list of movies",
-        data: filteredMovies // No brackets here if filteredMovies is already an array
-    });
-});
-
-
-app.get('/status', (req, res)=>{
-    res.status(200).json({status: "OK"});
-});
-
-app.post('/movies', (req,res)=>{
-    const data = req.body;
-    console.log('This is what the client sends', data);
-    if(!data.title || !data.year){
-       return res.status(400).json({
-            success:false,
-            message: "Movie title and Movie year is required"
-        });
-    }
-
-    movies.push(data);
-    res.status(201).json({success: true, message:`The movie with title: ${data.title}has been added successfully.`});
-    
-});
 
 
 
