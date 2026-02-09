@@ -1,8 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const movieRouter = require('./routes/movies');
 const usersRouter = require('./routes/users');
 const homePage = require('./routes/home');
 const { customHeader, blocker, logger } = require('./middleware/custom-middleware');
+const mongoose = require('mongoose');
+
 
 
 
@@ -30,6 +33,9 @@ app.use('/',homePage);
 
 
 app.listen(PORT,()=>{
+    mongoose.connect(
+        process.env.MONGODB_URI
+    );
     console.log(`App is listening on port ${PORT}`);
     
 });
