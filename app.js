@@ -1,40 +1,49 @@
-require("dotenv").config();
-const express = require("express");
-const movieRouter = require("./routes/movies");
-const usersRouter = require("./routes/users");
-const homePage = require("./routes/home");
-const {
-  customHeader,
-  blocker,
-  logger,
-} = require("./middleware/custom-middleware");
-const mongoose = require("mongoose");
-const connectDb = require("./db/connectDb");
+require('dotenv').config(); // Load environment variables first
+const express = require('express');
+const connectDb = require('./db/connectDb'); // Ensure this path matches your file
+const movieRouter = require('./routes/movies');
+const usersRouter = require('./routes/users');
+const homePage = require('./routes/home');
+const { customHeader, blocker, logger } = require('./middleware/custom-middleware');
 
 const app = express();
-const PORT = process.env.PORT || 8000; // Updated to use PORT from .env file
+const PORT = process.env.PORT || 3001;
 
-app.use(express.json()); // Middleware to parse JSON bodies
-
-// Custom Middleware functions
+// 1. Global Middleware
+app.use(express.json());
 app.use(logger);
 app.use(blocker);
 app.use(customHeader);
 
-// Routes
-app.use("/movies", movieRouter);
-app.use("/users", usersRouter);
-app.use("/", homePage);
+// 2. Routes
+app.use('/movies', movieRouter);
+app.use('/users', usersRouter);
+app.use('/', homePage);
 
-app.listen(PORT, async () => {
+// 3. Database Connection & Server Start Logic
+const startServer = async () => {
   try {
-    console.log("Connected to database");
+    if (!process.env.MONGODB_URI) {
+      throw new Error("MONGODB_URI is not defined in environment variables");
+    }
+
+    console.log("⏳ Connecting to MongoDB Atlas...");
     await connectDb(process.env.MONGODB_URI);
-    console.log(`App is listening on port ${PORT}`);
+    console.log("✅ Database connection successful");
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is listening on http://localhost:${PORT}`);
+    });
   } catch (error) {
-    console.log('An error occurred.');
-    console.log(error.message);
-    
-    
+    console.error("❌ Failed to start the application:");
+    console.error(error.message);
+
+    if (error.message.includes("SSL") || error.message.includes("whitelist")) {
+      console.log("👉 ACTION REQUIRED: Go to MongoDB Atlas > Network Access and add your current IP!");
+    }
+
+    process.exit(1); // Exit with failure
   }
-});
+};
+
+startServer();
